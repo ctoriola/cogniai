@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.ipynb
+*.log
+logs/
+data/
+models/*.pkl
+models/*.pt
+models/*.bin
+*.csv
+*.tsv
+*.json
+.DS_Store
+.env 
