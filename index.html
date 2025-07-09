@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni-Channel AI Scam & Fraud Detection Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+        }
+
+        .btn.danger {
+            background: #e74c3c;
+        }
+
+        .btn.danger:hover {
+            background: #c0392b;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid;
+        }
+
+        .result.critical {
+            background: #fee;
+            border-left-color: #e74c3c;
+        }
+
+        .result.high {
+            background: #fff3cd;
+            border-left-color: #f39c12;
+        }
+
+        .result.medium {
+            background: #fff8e1;
+            border-left-color: #ffc107;
+        }
+
+        .result.low {
+            background: #d4edda;
+            border-left-color: #27ae60;
+        }
+
+        .result.safe {
+            background: #e8f5e8;
+            border-left-color: #4caf50;
+        }
+
+        .alerts {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .alert-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .alert-item.critical {
+            background: #fee;
+            border-left-color: #e74c3c;
+        }
+
+        .alert-item.high {
+            background: #fff3cd;
+            border-left-color: #f39c12;
+        }
+
+        .alert-item.medium {
+            background: #fff8e1;
+            border-left-color: #ffc107;
+        }
+
+        .alert-item.low {
+            background: #d4edda;
+            border-left-color: #27ae60;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .channel-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .channel-tab {
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .channel-tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .channel-tab:hover {
+            background: #5a6fd8;
+            color: white;
+        }
+
+        .multi-modal-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .multi-modal-section h3 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .channel-input {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .channel-tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚨 Omni-Channel AI Scam & Fraud Detection Platform</h1>
+            <p>Advanced AI-powered multi-channel fraud detection and threat analysis</p>
+        </div>
+
+        <!-- Live Statistics -->
+        <div class="card">
+            <h3>📊 Live System Statistics</h3>
+            <div class="stats-grid" id="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="total-alerts">0</div>
+                    <div class="stat-label">Total Alerts</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="high-risk-alerts">0</div>
+                    <div class="stat-label">High Risk</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="email-alerts">0</div>
+                    <div class="stat-label">Email</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="webpage-alerts">0</div>
+                    <div class="stat-label">Webpage</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="social-alerts">0</div>
+                    <div class="stat-label">Social Media</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="transaction-alerts">0</div>
+                    <div class="stat-label">Transaction</div>
+                </div>
+            </div>
+            <button class="btn" onclick="refreshStats()">🔄 Refresh Stats</button>
+        </div>
+
+        <div class="dashboard">
+            <!-- Channel Analysis -->
+            <div class="card">
+                <h3>🔍 Channel Analysis</h3>
+                <div class="channel-tabs">
+                    <div class="channel-tab active" onclick="switchChannel('email')">📧 Email</div>
+                    <div class="channel-tab" onclick="switchChannel('webpage')">🌐 Webpage</div>
+                    <div class="channel-tab" onclick="switchChannel('social_media')">📱 Social Media</div>
+                    <div class="channel-tab" onclick="switchChannel('transaction')">💳 Transaction</div>
+                </div>
+                
+                <div id="channel-form">
+                    <!-- Email Form -->
+                    <div id="email-form" class="channel-input">
+                        <div class="form-group">
+                            <label>Email Content:</label>
+                            <textarea id="email-content" rows="6" placeholder="Paste email content here..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Sender:</label>
+                            <input type="text" id="email-sender" placeholder="sender@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Subject:</label>
+                            <input type="text" id="email-subject" placeholder="Email subject">
+                        </div>
+                        <button class="btn" onclick="analyzeChannel('email')">🔍 Analyze Email</button>
+                    </div>
+
+                    <!-- Webpage Form -->
+                    <div id="webpage-form" class="channel-input" style="display: none;">
+                        <div class="form-group">
+                            <label>URL:</label>
+                            <input type="url" id="webpage-url" placeholder="https://example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Page Content:</label>
+                            <textarea id="webpage-content" rows="6" placeholder="Paste web page content..."></textarea>
+                        </div>
+                        <button class="btn" onclick="analyzeChannel('webpage')">🔍 Analyze Webpage</button>
+                    </div>
+
+                    <!-- Social Media Form -->
+                    <div id="social_media-form" class="channel-input" style="display: none;">
+                        <div class="form-group">
+                            <label>Post Content:</label>
+                            <textarea id="social-content" rows="6" placeholder="Paste social media post..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Profile Info (JSON):</label>
+                            <textarea id="social-profile" rows="3" placeholder='{"followers": 100, "verified": false}'></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Links:</label>
+                            <input type="text" id="social-links" placeholder="https://link1.com, https://link2.com">
+                        </div>
+                        <button class="btn" onclick="analyzeChannel('social_media')">🔍 Analyze Social Media</button>
+                    </div>
+
+                    <!-- Transaction Form -->
+                    <div id="transaction-form" class="channel-input" style="display: none;">
+                        <div class="form-group">
+                            <label>Amount ($):</label>
+                            <input type="number" id="transaction-amount" placeholder="1000">
+                        </div>
+                        <div class="form-group">
+                            <label>Location (JSON):</label>
+                            <textarea id="transaction-location" rows="3" placeholder='{"city": "New York", "country": "USA"}'></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>User ID:</label>
+                            <input type="text" id="transaction-user" placeholder="user123">
+                        </div>
+                        <div class="form-group">
+                            <label>Timestamp:</label>
+                            <input type="datetime-local" id="transaction-timestamp">
+                        </div>
+                        <button class="btn" onclick="analyzeChannel('transaction')">🔍 Analyze Transaction</button>
+                    </div>
+                </div>
+                
+                <div id="channel-result"></div>
+            </div>
+
+            <!-- Multi-Modal Analysis -->
+            <div class="card">
+                <h3>🧠 Multi-Modal Fusion Analysis</h3>
+                <p>Analyze data from multiple channels simultaneously for comprehensive threat detection.</p>
+                
+                <div class="form-group">
+                    <label>Select Channels:</label>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 10px;">
+                        <label><input type="checkbox" value="email" checked> 📧 Email</label>
+                        <label><input type="checkbox" value="webpage"> 🌐 Webpage</label>
+                        <label><input type="checkbox" value="social_media"> 📱 Social Media</label>
+                        <label><input type="checkbox" value="transaction"> 💳 Transaction</label>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="analyzeMultiModal()">🧠 Analyze Multi-Modal</button>
+                <div id="multi-modal-result"></div>
+            </div>
+
+            <!-- AI System Status -->
+            <div class="card">
+                <h3>🤖 AI System Status</h3>
+                <div id="ai-status">
+                    <div class="loading">Loading AI status...</div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <button class="btn" onclick="refreshAIStatus()">🔄 Refresh Status</button>
+                    <button class="btn" onclick="saveModels()">💾 Save Models</button>
+                    <button class="btn" onclick="loadModels()">📂 Load Models</button>
+                </div>
+            </div>
+
+            <!-- Recent Alerts -->
+            <div class="card">
+                <h3>🚨 Recent Alerts</h3>
+                <div class="alerts" id="alerts">
+                    <div class="loading">Loading alerts...</div>
+                </div>
+                <button class="btn" onclick="refreshAlerts()">🔄 Refresh Alerts</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000';
+        let currentChannel = 'email';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshStats();
+            refreshAlerts();
+            refreshAIStatus();
+            // Auto-refresh every 30 seconds
+            setInterval(refreshStats, 30000);
+            setInterval(refreshAlerts, 30000);
+            setInterval(refreshAIStatus, 60000);
+        });
+
+        function switchChannel(channel) {
+            currentChannel = channel;
+            
+            // Update active tab
+            document.querySelectorAll('.channel-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show/hide forms
+            document.querySelectorAll('.channel-input').forEach(form => {
+                form.style.display = 'none';
+            });
+            document.getElementById(`${channel}-form`).style.display = 'block';
+        }
+
+        async function refreshStats() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dashboard/stats`);
+                const stats = await response.json();
+                
+                document.getElementById('total-alerts').textContent = stats.total_alerts || 0;
+                document.getElementById('high-risk-alerts').textContent = stats.high_risk_alerts || 0;
+                document.getElementById('email-alerts').textContent = stats.email_alerts || 0;
+                document.getElementById('webpage-alerts').textContent = stats.web_page_alerts || 0;
+                document.getElementById('social-alerts').textContent = stats.social_media_alerts || 0;
+                document.getElementById('transaction-alerts').textContent = stats.transaction_alerts || 0;
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+            }
+        }
+
+        async function refreshAlerts() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dashboard/alerts`);
+                const alerts = await response.json();
+                
+                const alertsContainer = document.getElementById('alerts');
+                if (alerts.length === 0) {
+                    alertsContainer.innerHTML = '<div class="loading">No alerts yet</div>';
+                    return;
+                }
+                
+                alertsContainer.innerHTML = alerts.map(alert => `
+                    <div class="alert-item ${alert.threat_level?.toLowerCase() || 'medium'}">
+                        <strong>${alert.channel?.toUpperCase() || 'UNKNOWN'}</strong> - ${alert.description || 'Alert detected'}
+                        <br><small>Risk: ${(alert.risk_score * 100).toFixed(1)}% | ${new Date(alert.timestamp).toLocaleTimeString()}</small>
+                        ${alert.recommendations ? `<br><small><strong>Recommendations:</strong> ${alert.recommendations.join(', ')}</small>` : ''}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error fetching alerts:', error);
+                document.getElementById('alerts').innerHTML = '<div class="error">Error loading alerts</div>';
+            }
+        }
+
+        async function analyzeChannel(channel) {
+            const resultDiv = document.getElementById('channel-result');
+            resultDiv.innerHTML = '<div class="loading">Analyzing...</div>';
+
+            try {
+                let data = {};
+                
+                switch(channel) {
+                    case 'email':
+                        data = {
+                            content: document.getElementById('email-content').value,
+                            sender: document.getElementById('email-sender').value,
+                            subject: document.getElementById('email-subject').value
+                        };
+                        break;
+                    case 'webpage':
+                        data = {
+                            url: document.getElementById('webpage-url').value,
+                            content: document.getElementById('webpage-content').value
+                        };
+                        break;
+                    case 'social_media':
+                        data = {
+                            content: document.getElementById('social-content').value,
+                            profile: JSON.parse(document.getElementById('social-profile').value || '{}'),
+                            links: document.getElementById('social-links').value.split(',').map(l => l.trim())
+                        };
+                        break;
+                    case 'transaction':
+                        data = {
+                            amount: parseFloat(document.getElementById('transaction-amount').value) || 0,
+                            location: JSON.parse(document.getElementById('transaction-location').value || '{}'),
+                            user_id: document.getElementById('transaction-user').value,
+                            timestamp: document.getElementById('transaction-timestamp').value
+                        };
+                        break;
+                }
+
+                const response = await fetch(`${API_BASE}/analyze/${channel}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                const threatClass = result.threat_level?.toLowerCase() || 'medium';
+                
+                resultDiv.innerHTML = `
+                    <div class="result ${threatClass}">
+                        <h4>Analysis Results:</h4>
+                        <p><strong>Channel:</strong> ${result.channel}</p>
+                        <p><strong>Risk Score:</strong> ${(result.risk_score * 100).toFixed(1)}%</p>
+                        <p><strong>Threat Level:</strong> ${result.threat_level}</p>
+                        <p><strong>Description:</strong> ${result.alert?.description || 'Analysis completed'}</p>
+                        ${result.alert?.recommendations ? `<p><strong>Recommendations:</strong> ${result.alert.recommendations.join(', ')}</p>` : ''}
+                    </div>
+                `;
+
+                refreshStats();
+                refreshAlerts();
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">Error analyzing data</div>';
+                console.error('Error:', error);
+            }
+        }
+
+        async function analyzeMultiModal() {
+            const resultDiv = document.getElementById('multi-modal-result');
+            resultDiv.innerHTML = '<div class="loading">Analyzing multiple channels...</div>';
+
+            try {
+                const selectedChannels = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+                    .map(cb => cb.value);
+                
+                if (selectedChannels.length === 0) {
+                    resultDiv.innerHTML = '<div class="error">Please select at least one channel</div>';
+                    return;
+                }
+
+                // Use actual form data for selected channels
+                const channelData = {};
+                selectedChannels.forEach(channel => {
+                    switch(channel) {
+                        case 'email':
+                            channelData.email = {
+                                content: document.getElementById('email-content').value || '',
+                                sender: document.getElementById('email-sender').value || '',
+                                subject: document.getElementById('email-subject').value || ''
+                            };
+                            break;
+                        case 'webpage':
+                            channelData.webpage = {
+                                url: document.getElementById('webpage-url').value || '',
+                                content: document.getElementById('webpage-content').value || ''
+                            };
+                            break;
+                        case 'social_media':
+                            channelData.social_media = {
+                                content: document.getElementById('social-content').value || '',
+                                profile: JSON.parse(document.getElementById('social-profile').value || '{}'),
+                                links: document.getElementById('social-links').value ? document.getElementById('social-links').value.split(',').map(l => l.trim()) : []
+                            };
+                            break;
+                        case 'transaction':
+                            channelData.transaction = {
+                                amount: parseFloat(document.getElementById('transaction-amount').value) || 0,
+                                location: JSON.parse(document.getElementById('transaction-location').value || '{}'),
+                                user_id: document.getElementById('transaction-user').value || '',
+                                timestamp: document.getElementById('transaction-timestamp').value || new Date().toISOString()
+                            };
+                            break;
+                    }
+                });
+
+                const response = await fetch(`${API_BASE}/analyze/multi_modal`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        channels: selectedChannels,
+                        data: channelData
+                    })
+                });
+
+                const result = await response.json();
+                
+                const threatClass = result.overall_threat_level?.toLowerCase() || 'medium';
+                
+                resultDiv.innerHTML = `
+                    <div class="result ${threatClass}">
+                        <h4>Multi-Modal Analysis Results:</h4>
+                        <p><strong>Fused Risk Score:</strong> ${(result.fused_risk_score * 100).toFixed(1)}%</p>
+                        <p><strong>Overall Threat Level:</strong> ${result.overall_threat_level}</p>
+                        <p><strong>Channels Analyzed:</strong> ${result.channel_results ? Object.keys(result.channel_results).join(', ') : 'None'}</p>
+                        <h5>Individual Channel Results:</h5>
+                        ${result.channel_results ? Object.entries(result.channel_results).map(([channel, res]) => `
+                            <p><strong>${channel}:</strong> ${(res.risk_score * 100).toFixed(1)}% risk (${res.threat_level})</p>
+                        `).join('') : ''}
+                    </div>
+                `;
+
+                refreshStats();
+                refreshAlerts();
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">Error analyzing multi-modal data</div>';
+                console.error('Error:', error);
+            }
+        }
+
+        async function refreshAIStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/api/ai/status`);
+                const status = await response.json();
+                
+                const aiStatusDiv = document.getElementById('ai-status');
+                const trainedChannels = status.trained_models || [];
+                const channelCount = trainedChannels.length;
+                
+                aiStatusDiv.innerHTML = `
+                    <div class="stat-item">
+                        <div class="stat-value">${status.advanced_ai_available ? '✅' : '❌'}</div>
+                        <div class="stat-label">Advanced AI</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${channelCount}</div>
+                        <div class="stat-label">Channels Trained</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${status.active_ai_system || 'Unknown'}</div>
+                        <div class="stat-label">Active System</div>
+                    </div>
+                    <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                        <strong>AI Capabilities:</strong><br>
+                        ${status.advanced_ai_available ? 
+                            '🤖 Machine Learning • 🧠 Deep Learning • 📝 Natural Language Processing' : 
+                            '📝 Rule-based fallback system'
+                        }
+                        ${channelCount > 0 ? `<br><strong>Trained Channels:</strong> ${trainedChannels.join(', ')}` : ''}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error fetching AI status:', error);
+                document.getElementById('ai-status').innerHTML = '<div class="error">Error loading AI status</div>';
+            }
+        }
+
+        async function saveModels() {
+            try {
+                const response = await fetch(`${API_BASE}/api/ai/save`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    alert('✅ Models saved successfully!');
+                } else {
+                    alert('❌ Error saving models: ' + result.error);
+                }
+            } catch (error) {
+                alert('❌ Error saving models: ' + error.message);
+            }
+        }
+
+        async function loadModels() {
+            try {
+                const response = await fetch(`${API_BASE}/api/ai/load`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    alert('✅ Models loaded successfully!');
+                    refreshAIStatus();
+                } else {
+                    alert('❌ Error loading models: ' + result.error);
+                }
+            } catch (error) {
+                alert('❌ Error loading models: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html> 
