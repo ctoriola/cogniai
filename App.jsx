@@ -59,13 +59,12 @@ function App() {
         {results.email && (
           <div className={`result-card ${results.email.risk_score > 0.7 ? 'high-risk' : 'low-risk'}`}>
             <h3>Email Analysis Result</h3>
-            <p>Risk Score: <strong>{results.email.risk_score.toFixed(4)}</strong></p>
-            <p>Sentiment: {results.email.sentiment} ({results.email.sentiment_score.toFixed(2)})</p>
+            <p>Risk Level: <strong>{results.email.risk_level}</strong> ({Number.isFinite(results.email.risk_score) ? results.email.risk_score + '%' : 'N/A'})</p>
             <div>
-              <h4>Key Risk Indicators:</h4>
+              <h4>Key Features:</h4>
               <ul>
-                {results.email.top_risk_features.map(([token, score], i) => (
-                  <li key={i}>{token}: {score.toFixed(4)}</li>
+                {Object.entries(results.email.features || {}).map(([feature, value]) => (
+                  <li key={feature}>{feature}<br/>{value.toFixed ? value.toFixed(3) : value}</li>
                 ))}
               </ul>
             </div>
