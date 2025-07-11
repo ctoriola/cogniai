@@ -10,8 +10,10 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
 # Use Railway Postgres if available, fallback to SQLite for local dev
 
+import os
+print("RAW DATABASE_URL:", repr(os.environ.get('DATABASE_URL')))
 db_url = os.environ.get('DATABASE_URL', 'sqlite:///users.db')
-if db_url.startswith('postgres://'):
+if db_url and db_url.startswith('postgres://'):
     db_url = db_url.replace('postgres://', 'postgresql://', 1)
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -22,6 +24,13 @@ ai = LightweightAI()
 with app.app_context():
     db.create_all()
     print("Tables created! Using database:", app.config['SQLALCHEMY_DATABASE_URI'])
+    # Print user table schema for confirmation
+    from sqlalchemy import inspect
+    inspector = inspect(db.engine)
+    columns = inspector.get_columns('user')
+    print("User table columns:")
+    for col in columns:
+        print(f"  {col['name']}: {col['type']}")
 
 import os
 print("ENV VARS:", dict(os.environ))
