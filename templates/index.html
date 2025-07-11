@@ -388,7 +388,7 @@
         }
         function showResult(data, type) {
             const resultDiv = document.getElementById('result');
-            const risk = data.risk;
+            const risk = typeof data.risk === 'number' ? data.risk : (typeof data.risk_score === 'number' ? data.risk_score / 100 : 0);
             let riskClass = 'risk-low';
             let riskText = 'LOW';
             if (risk > 0.7) { riskClass = 'risk-high'; riskText = 'HIGH'; }
@@ -398,7 +398,7 @@
                 <p><strong>Risk Level:</strong> <span class="${riskClass}">${riskText} (${(risk * 100).toFixed(1)}%)</span></p>
                 <p><strong>Key Features:</strong></p>
                 <div class="feature-cards">
-                    ${Object.entries(data.features).map(([key, value]) => {
+                    ${data.features && typeof data.features === 'object' ? Object.entries(data.features).map(([key, value]) => {
                         const numValue = typeof value === 'number' ? value : parseFloat(value) || 0;
                         let valueClass = 'low';
                         if (numValue > 0.7) valueClass = 'high';
@@ -409,7 +409,7 @@
                                 <div class="feature-value ${valueClass}">${typeof value === 'number' ? value.toFixed(3) : value}</div>
                             </div>
                         `;
-                    }).join('')}
+                    }).join('') : '<div>No features available.</div>'}
                 </div>
             `;
             resultDiv.className = 'result success';
@@ -425,7 +425,16 @@
         function testAPI() {
             fetch('/test')
                 .then(response => response.json())
-                .then(data => { showResult(data, 'API Test'); })
+                .then(data => {
+                    if (data && typeof data === 'object' && data.status) {
+                        const resultDiv = document.getElementById('result');
+                        resultDiv.innerHTML = `<h4>API Test</h4><p>${data.status}</p>`;
+                        resultDiv.className = 'result success';
+                        resultDiv.style.display = 'block';
+                    } else {
+                        showResult(data, 'API Test');
+                    }
+                })
                 .catch(error => { showError(error); });
         }
         function clearResult() {
