@@ -28,10 +28,26 @@ with app.app_context():
     # Print user table schema for confirmation
     from sqlalchemy import inspect
     inspector = inspect(db.engine)
-    columns = inspector.get_columns('user')
+    columns = inspector.get_columns('users')
     print("User table columns:")
     for col in columns:
         print(f"  {col['name']}: {col['type']}")
+    
+    # Check if is_admin column exists, if not add it
+    column_names = [col['name'] for col in columns]
+    if 'is_admin' not in column_names:
+        print("Adding is_admin column to users table...")
+        try:
+            db.engine.execute('ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE')
+            print("Successfully added is_admin column!")
+        except Exception as e:
+            print(f"Error adding is_admin column: {e}")
+            # Try alternative syntax for PostgreSQL
+            try:
+                db.engine.execute('ALTER TABLE "users" ADD COLUMN is_admin BOOLEAN DEFAULT FALSE')
+                print("Successfully added is_admin column with quotes!")
+            except Exception as e2:
+                print(f"Error with quoted table name: {e2}")
 
 import os
 print("ENV VARS:", dict(os.environ))
@@ -220,6 +236,24 @@ def admin_user_stats():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route("/migrate/add-admin-column")
+def migrate_add_admin_column():
+    """Manual migration endpoint to add is_admin column"""
+    try:
+        # Check if column exists
+        inspector = inspect(db.engine)
+        columns = inspector.get_columns('users')
+        column_names = [col['name'] for col in columns]
+        
+        if 'is_admin' not in column_names:
+            # Add the column
+            db.engine.execute('ALTER TABLE "users" ADD COLUMN is_admin BOOLEAN DEFAULT FALSE')
+            return jsonify({"message": "Successfully added is_admin column to users table"})
+        else:
+            return jsonify({"message": "is_admin column already exists"})
+    except Exception as e:
+        return jsonify({"error": f"Migration failed: {str(e)}"}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
