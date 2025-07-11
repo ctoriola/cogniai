@@ -21,6 +21,7 @@ ai = LightweightAI()
 
 with app.app_context():
     db.create_all()
+    print("Tables created! Using database:", app.config['SQLALCHEMY_DATABASE_URI'])
 
 @app.route("/")
 def home():
