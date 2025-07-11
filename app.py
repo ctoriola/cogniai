@@ -72,14 +72,8 @@ def user_data():
 def analyze_email():
     try:
         data = request.json or {}
-        print(f"Received email data: {data}")
-        features = ai.extract_features(data, 'email')
-        risk = ai.predict_risk(features, 'email')
-        result = {
-            "risk": risk,
-            "features": features
-        }
-        print(f"Email analysis result: {result}")
+        email_content = data.get('content', '')
+        result = ai.analyze_email(email_content)
         return jsonify(result)
     except Exception as e:
         print(f"Error in email analysis: {e}")
@@ -87,23 +81,24 @@ def analyze_email():
 
 @app.route("/analyze/transaction", methods=["POST"])
 def analyze_transaction():
-    data = request.json or {}
-    features = ai.extract_features(data, 'transaction')
-    risk = ai.predict_risk(features, 'transaction')
-    return jsonify({
-        "risk": risk,
-        "features": features
-    })
+    try:
+        data = request.json or {}
+        result = ai.analyze_transaction(data)
+        return jsonify(result)
+    except Exception as e:
+        print(f"Error in transaction analysis: {e}")
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/analyze/social_media", methods=["POST"])
 def analyze_social_media():
-    data = request.json or {}
-    features = ai.extract_features(data, 'social_media')
-    risk = ai.predict_risk(features, 'social_media')
-    return jsonify({
-        "risk": risk,
-        "features": features
-    })
+    try:
+        data = request.json or {}
+        post_content = data.get('content', '')
+        result = ai.analyze_social_media(post_content)
+        return jsonify(result)
+    except Exception as e:
+        print(f"Error in social media analysis: {e}")
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/test")
 def test():
