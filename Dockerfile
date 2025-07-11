@@ -1,8 +1,8 @@
 # Use a smaller base image
 FROM python:3.10-alpine
 
-# Install system dependencies
-RUN apk add --no-cache gcc musl-dev libffi-dev
+# Install system dependencies for numpy, scikit-learn, psycopg2
+RUN apk add --no-cache gcc musl-dev libffi-dev python3-dev postgresql-dev build-base
 
 # Set working directory
 WORKDIR /app
