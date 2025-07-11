@@ -38,13 +38,15 @@ with app.app_context():
     if 'is_admin' not in column_names:
         print("Adding is_admin column to users table...")
         try:
-            db.engine.execute('ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE')
+            db.session.execute('ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE')
+            db.session.commit()
             print("Successfully added is_admin column!")
         except Exception as e:
             print(f"Error adding is_admin column: {e}")
             # Try alternative syntax for PostgreSQL
             try:
-                db.engine.execute('ALTER TABLE "users" ADD COLUMN is_admin BOOLEAN DEFAULT FALSE')
+                db.session.execute('ALTER TABLE "users" ADD COLUMN is_admin BOOLEAN DEFAULT FALSE')
+                db.session.commit()
                 print("Successfully added is_admin column with quotes!")
             except Exception as e2:
                 print(f"Error with quoted table name: {e2}")
@@ -77,19 +79,33 @@ def create_admin():
     if not data or not data.get('username') or not data.get('password'):
         return jsonify({'error': 'Username and password required'}), 400
     
-    # Check if any admin exists
-    existing_admin = User.query.filter_by(is_admin=True).first()
-    if existing_admin:
-        return jsonify({'error': 'Admin user already exists'}), 403
+    # Check if any admin exists (handle missing column gracefully)
+    try:
+        existing_admin = User.query.filter_by(is_admin=True).first()
+        if existing_admin:
+            return jsonify({'error': 'Admin user already exists'}), 403
+    except Exception as e:
+        # If is_admin column doesn't exist, assume no admin exists
+        print(f"Warning: Could not check for existing admin: {e}")
+        # Continue with creation
     
     if User.query.filter_by(username=data['username']).first():
         return jsonify({'error': 'Username already exists'}), 400
     
-    user = User(username=data['username'], is_admin=True)
-    user.set_password(data['password'])
-    db.session.add(user)
-    db.session.commit()
-    return jsonify({'message': 'Admin user created successfully'})
+    try:
+        user = User(username=data['username'], is_admin=True)
+        user.set_password(data['password'])
+        db.session.add(user)
+        db.session.commit()
+        return jsonify({'message': 'Admin user created successfully'})
+    except Exception as e:
+        # If is_admin column doesn't exist, create user without admin flag
+        print(f"Warning: Could not set admin flag: {e}")
+        user = User(username=data['username'])
+        user.set_password(data['password'])
+        db.session.add(user)
+        db.session.commit()
+        return jsonify({'message': 'User created (admin flag not available)'})
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -248,12 +264,34 @@ def migrate_add_admin_column():
         
         if 'is_admin' not in column_names:
             # Add the column
-            db.engine.execute('ALTER TABLE "users" ADD COLUMN is_admin BOOLEAN DEFAULT FALSE')
+            db.session.execute('ALTER TABLE "users" ADD COLUMN is_admin BOOLEAN DEFAULT FALSE')
+            db.session.commit()
             return jsonify({"message": "Successfully added is_admin column to users table"})
         else:
             return jsonify({"message": "is_admin column already exists"})
     except Exception as e:
         return jsonify({"error": f"Migration failed: {str(e)}"}), 500
+
+@app.route("/debug/schema")
+def debug_schema():
+    """Debug endpoint to check current database schema"""
+    try:
+        inspector = inspect(db.engine)
+        columns = inspector.get_columns('users')
+        column_info = []
+        for col in columns:
+            column_info.append({
+                'name': col['name'],
+                'type': str(col['type']),
+                'nullable': col.get('nullable', True)
+            })
+        return jsonify({
+            "table": "users",
+            "columns": column_info,
+            "has_is_admin": any(col['name'] == 'is_admin' for col in columns)
+        })
+    except Exception as e:
+        return jsonify({"error": f"Schema check failed: {str(e)}"}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
