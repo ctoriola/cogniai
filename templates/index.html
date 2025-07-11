@@ -62,7 +62,6 @@
                 </div>
                 <button type="submit">Login</button>
                 <button type="button" onclick="showSignup()">Sign Up</button>
-                <button type="button" onclick="showAdminCreate()" style="background-color: #dc3545;">Create Admin</button>
             </form>
             <form id="signup-form" style="display:none;">
                 <div class="form-group">
@@ -74,18 +73,6 @@
                     <input type="password" id="signup-password" required>
                 </div>
                 <button type="submit">Sign Up</button>
-                <button type="button" onclick="showLogin()">Back to Login</button>
-            </form>
-            <form id="admin-create-form" style="display:none;">
-                <div class="form-group">
-                    <label for="admin-username">Admin Username:</label>
-                    <input type="text" id="admin-username" required>
-                </div>
-                <div class="form-group">
-                    <label for="admin-password">Admin Password:</label>
-                    <input type="password" id="admin-password" required>
-                </div>
-                <button type="submit" style="background-color: #dc3545;">Create Admin User</button>
                 <button type="button" onclick="showLogin()">Back to Login</button>
             </form>
         </div>
@@ -193,10 +180,6 @@
             document.getElementById('signup-form').style.display = 'none';
             document.getElementById('login-form').style.display = 'block';
         }
-        function showAdminCreate() {
-            document.getElementById('login-form').style.display = 'none';
-            document.getElementById('admin-create-form').style.display = 'block';
-        }
         function showMainApp() {
             document.getElementById('auth-section').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
@@ -250,6 +233,7 @@
                 // Show admin status if user is admin
                 if (data.is_admin) {
                     alert('Welcome Admin! You have access to the admin dashboard.');
+                    window.location.href = '/admin/dashboard'; // Redirect admin to dashboard
                 }
             } else {
                 alert(data.error || 'Login failed');
@@ -272,25 +256,6 @@
                     showLogin();
                 } else {
                     alert(data.error || 'Signup failed');
-                }
-            });
-        };
-        document.getElementById('admin-create-form').onsubmit = function(e) {
-            e.preventDefault();
-            const username = document.getElementById('admin-username').value;
-            const password = document.getElementById('admin-password').value;
-            fetch('/admin/create', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.message) {
-                    alert('Admin user created successfully!');
-                    showLogin();
-                } else {
-                    alert(data.error || 'Failed to create admin user');
                 }
             });
         };
