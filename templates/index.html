@@ -5,165 +5,399 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fraud Detection API</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
-        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { color: #333; text-align: center; margin-bottom: 30px; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
-        textarea { height: 100px; resize: vertical; }
-        button { background-color: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-right: 10px; }
-        button:hover { background-color: #0056b3; }
-        .result { margin-top: 20px; padding: 15px; border-radius: 5px; display: none; }
-        .result.success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
-        .result.error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
-        .risk-high { color: #dc3545; font-weight: bold; }
-        .risk-medium { color: #ffc107; font-weight: bold; }
-        .risk-low { color: #28a745; font-weight: bold; }
-        .tabs { display: flex; margin-bottom: 20px; }
-        .tab { padding: 10px 20px; background-color: #e9ecef; border: none; cursor: pointer; border-radius: 5px 5px 0 0; margin-right: 5px; }
-        .tab.active { background-color: #007bff; color: white; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .feature-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
-        .feature-card { background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.2s; }
-        .feature-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
-        .feature-name { font-weight: bold; color: #333; margin-bottom: 5px; font-size: 14px; text-transform: capitalize; }
-        .feature-value { font-size: 18px; font-weight: bold; color: #007bff; }
-        .feature-value.high { color: #dc3545; }
-        .feature-value.medium { color: #ffc107; }
-        .feature-value.low { color: #28a745; }
-        .auth-section { margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; }
-        .user-info { margin-bottom: 20px; }
-        .history-section { margin-top: 30px; }
-        .history-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
-        .history-list { list-style: none; padding: 0; }
-        .history-item { background: #f1f1f1; border-radius: 6px; margin-bottom: 10px; padding: 12px; }
-        .history-type { font-weight: bold; color: #007bff; }
-        .logout-btn { background-color: #dc3545; }
-        .logout-btn:hover { background-color: #a71d2a; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            padding: 30px; 
+            text-align: center;
+        }
+        .header h1 { 
+            margin: 0; 
+            font-size: 2.5rem; 
+            font-weight: 300;
+        }
+        .header p { 
+            margin: 10px 0 0 0; 
+            opacity: 0.9; 
+            font-size: 1.1rem;
+        }
+        .content { 
+            padding: 30px; 
+        }
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+            font-weight: bold; 
+            color: #555; 
+        }
+        input, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            font-size: 14px; 
+            box-sizing: border-box;
+        }
+        textarea { 
+            height: 100px; 
+            resize: vertical; 
+        }
+        button { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            margin-right: 10px; 
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        button:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .result { 
+            margin-top: 20px; 
+            padding: 20px; 
+            border-radius: 12px; 
+            display: none; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .result.success { 
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); 
+            border: 1px solid #c3e6cb; 
+            color: #155724; 
+        }
+        .result.error { 
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); 
+            border: 1px solid #f5c6cb; 
+            color: #721c24; 
+        }
+        .risk-high { 
+            color: #dc3545; 
+            font-weight: bold; 
+        }
+        .risk-medium { 
+            color: #ffc107; 
+            font-weight: bold; 
+        }
+        .risk-low { 
+            color: #28a745; 
+            font-weight: bold; 
+        }
+        .tabs { 
+            display: flex; 
+            margin-bottom: 20px; 
+            background: #f8f9fa; 
+            border-radius: 8px; 
+            padding: 5px;
+        }
+        .tab { 
+            padding: 12px 20px; 
+            background: transparent; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 6px; 
+            margin-right: 5px; 
+            transition: all 0.2s ease;
+            color: #6c757d;
+        }
+        .tab.active { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .tab-content { 
+            display: none; 
+            background: #f8f9fa; 
+            border-radius: 12px; 
+            padding: 25px; 
+            margin-bottom: 20px;
+        }
+        .tab-content.active { 
+            display: block; 
+        }
+        .feature-cards { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 15px; 
+            margin-top: 15px; 
+        }
+        .feature-card { 
+            background: white; 
+            border: 1px solid #e0e0e0; 
+            border-radius: 12px; 
+            padding: 20px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .feature-card:hover { 
+            transform: translateY(-4px); 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15); 
+        }
+        .feature-name { 
+            font-weight: bold; 
+            color: #333; 
+            margin-bottom: 8px; 
+            font-size: 14px; 
+            text-transform: capitalize; 
+        }
+        .feature-value { 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #667eea; 
+        }
+        .feature-value.high { 
+            color: #dc3545; 
+        }
+        .feature-value.medium { 
+            color: #ffc107; 
+        }
+        .feature-value.low { 
+            color: #28a745; 
+        }
+        .auth-section { 
+            margin-bottom: 30px; 
+            padding: 25px; 
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .user-info { 
+            margin-bottom: 20px; 
+            padding: 15px; 
+            background: white; 
+            border-radius: 8px; 
+            border-left: 4px solid #667eea;
+        }
+        .history-section { 
+            margin-top: 30px; 
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+            border-radius: 12px; 
+            padding: 25px;
+        }
+        .history-title { 
+            font-size: 18px; 
+            font-weight: bold; 
+            margin-bottom: 15px; 
+            color: #333;
+        }
+        .history-list { 
+            list-style: none; 
+            padding: 0; 
+        }
+        .history-item { 
+            background: white; 
+            border-radius: 12px; 
+            margin-bottom: 15px; 
+            padding: 20px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+        .history-type { 
+            font-weight: bold; 
+            color: #667eea; 
+        }
+        .logout-btn { 
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); 
+            margin-left: 10px;
+        }
+        .logout-btn:hover { 
+            background: linear-gradient(135deg, #c82333 0%, #a71d2a 100%); 
+        }
+        .nav-links { 
+            text-align: center; 
+            margin-top: 20px;
+        }
+        .nav-links a { 
+            color: white; 
+            text-decoration: none; 
+            margin: 0 15px; 
+            padding: 8px 16px; 
+            border-radius: 6px; 
+            background: rgba(255,255,255,0.2);
+            transition: background 0.2s ease;
+        }
+        .nav-links a:hover { 
+            background: rgba(255,255,255,0.3);
+        }
+        .tools-section { 
+            margin-top: 30px; 
+            padding: 25px; 
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .tools-section h4 { 
+            margin: 0 0 15px 0; 
+            color: #333;
+        }
+        .admin-link { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            padding: 12px 20px; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            display: inline-block; 
+            margin-right: 10px; 
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .admin-link:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .clear-btn { 
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        }
+        .clear-btn:hover { 
+            background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🤖 Fraud Detection API</h1>
-
-        <!-- Auth Section -->
-        <div class="auth-section" id="auth-section">
-            <div id="user-info" class="user-info" style="display:none;"></div>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="login-username">Username:</label>
-                    <input type="text" id="login-username" required>
-                </div>
-                <div class="form-group">
-                    <label for="login-password">Password:</label>
-                    <input type="password" id="login-password" required>
-                </div>
-                <button type="submit">Login</button>
-                <button type="button" onclick="showSignup()">Sign Up</button>
-            </form>
-            <form id="signup-form" style="display:none;">
-                <div class="form-group">
-                    <label for="signup-username">Username:</label>
-                    <input type="text" id="signup-username" required>
-                </div>
-                <div class="form-group">
-                    <label for="signup-password">Password:</label>
-                    <input type="password" id="signup-password" required>
-                </div>
-                <button type="submit">Sign Up</button>
-                <button type="button" onclick="showLogin()">Back to Login</button>
-            </form>
+        <div class="header">
+            <h1>🤖 Fraud Detection System</h1>
+            <p>Advanced AI-powered fraud detection across multiple channels</p>
         </div>
-
-        <!-- User Analysis Forms (hidden until login) -->
-        <div id="main-app" style="display:none;">
-            <div class="tabs">
-                <button class="tab active" onclick="showTab('email')">Email Analysis</button>
-                <button class="tab" onclick="showTab('transaction')">Transaction Analysis</button>
-                <button class="tab" onclick="showTab('social')">Social Media Analysis</button>
+        
+        <div class="content">
+            <!-- Auth Section -->
+            <div class="auth-section" id="auth-section">
+                <div id="user-info" class="user-info" style="display:none;"></div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-username">Username:</label>
+                        <input type="text" id="login-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password:</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit">Login</button>
+                    <button type="button" onclick="showSignup()">Sign Up</button>
+                </form>
+                <form id="signup-form" style="display:none;">
+                    <div class="form-group">
+                        <label for="signup-username">Username:</label>
+                        <input type="text" id="signup-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password">Password:</label>
+                        <input type="password" id="signup-password" required>
+                    </div>
+                    <button type="submit">Sign Up</button>
+                    <button type="button" onclick="showLogin()">Back to Login</button>
+                </form>
             </div>
 
-            <!-- Email Analysis -->
-            <div id="email" class="tab-content active">
-                <h3>📧 Email Fraud Detection</h3>
-                <div class="form-group">
-                    <label for="email-sender">Sender:</label>
-                    <input type="text" id="email-sender" value="noreply@fake-bank.com" placeholder="noreply@fake-bank.com">
+            <!-- User Analysis Forms (hidden until login) -->
+            <div id="main-app" style="display:none;">
+                <div class="tabs">
+                    <button class="tab active" onclick="showTab('email')">📧 Email Analysis</button>
+                    <button class="tab" onclick="showTab('transaction')">💳 Transaction Analysis</button>
+                    <button class="tab" onclick="showTab('social')">📱 Social Media Analysis</button>
                 </div>
-                <div class="form-group">
-                    <label for="email-subject">Subject:</label>
-                    <input type="text" id="email-subject" value="URGENT: Your account has been suspended" placeholder="URGENT: Account Suspended">
+
+                <!-- Email Analysis -->
+                <div id="email" class="tab-content active">
+                    <h3>📧 Email Fraud Detection</h3>
+                    <div class="form-group">
+                        <label for="email-sender">Sender:</label>
+                        <input type="text" id="email-sender" value="noreply@fake-bank.com" placeholder="noreply@fake-bank.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="email-subject">Subject:</label>
+                        <input type="text" id="email-subject" value="URGENT: Your account has been suspended" placeholder="URGENT: Account Suspended">
+                    </div>
+                    <div class="form-group">
+                        <label for="email-content">Content:</label>
+                        <textarea id="email-content" placeholder="Your account has been suspended. Click here to verify your identity immediately: http://bit.ly/fake-bank">URGENT: Your account has been suspended due to suspicious activity. Click here to verify your identity immediately: http://bit.ly/fake-bank-verify. This is your final warning before account termination.</textarea>
+                    </div>
+                    <button id="email-btn" onclick="analyzeEmail()">Analyze Email</button>
                 </div>
-                <div class="form-group">
-                    <label for="email-content">Content:</label>
-                    <textarea id="email-content" placeholder="Your account has been suspended. Click here to verify your identity immediately: http://bit.ly/fake-bank">URGENT: Your account has been suspended due to suspicious activity. Click here to verify your identity immediately: http://bit.ly/fake-bank-verify. This is your final warning before account termination.</textarea>
+
+                <!-- Transaction Analysis -->
+                <div id="transaction" class="tab-content">
+                    <h3>💳 Transaction Fraud Detection</h3>
+                    <div class="form-group">
+                        <label for="transaction-amount">Amount:</label>
+                        <input type="number" id="transaction-amount" value="15000" placeholder="15000">
+                    </div>
+                    <div class="form-group">
+                        <label for="transaction-description">Description:</label>
+                        <input type="text" id="transaction-description" value="Large transfer to unknown account" placeholder="Large transfer to unknown account">
+                    </div>
+                    <div class="form-group">
+                        <label for="transaction-location">Location (distance from home):</label>
+                        <input type="number" id="transaction-location" value="1500" placeholder="1500">
+                    </div>
+                    <div class="form-group">
+                        <label for="transaction-time">Timestamp:</label>
+                        <input type="datetime-local" id="transaction-time">
+                    </div>
+                    <button id="transaction-btn" onclick="analyzeTransaction()">Analyze Transaction</button>
                 </div>
-                <button id="email-btn" onclick="analyzeEmail()">Analyze Email</button>
+
+                <!-- Social Media Analysis -->
+                <div id="social" class="tab-content">
+                    <h3>📱 Social Media Scam Detection</h3>
+                    <div class="form-group">
+                        <label for="social-content">Content:</label>
+                        <textarea id="social-content" placeholder="FREE BITCOIN! Click here to claim your prize: http://bit.ly/fake-crypto">FREE BITCOIN! You've been selected for our exclusive giveaway! Click here to claim your prize: http://bit.ly/fake-crypto. Limited time offer!</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="social-followers">Followers:</label>
+                        <input type="number" id="social-followers" value="5" placeholder="5">
+                    </div>
+                    <div class="form-group">
+                        <label for="social-verified">Verified Account:</label>
+                        <select id="social-verified">
+                            <option value="false" selected>No</option>
+                            <option value="true">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="social-links">Suspicious Links:</label>
+                        <input type="text" id="social-links" value="http://bit.ly/fake-crypto" placeholder="http://bit.ly/fake-crypto">
+                    </div>
+                    <button id="social-btn" onclick="analyzeSocial()">Analyze Social Media</button>
+                </div>
+
+                <div id="result" class="result"></div>
+
+                <!-- User History Section -->
+                <div class="history-section" id="history-section" style="display:none;">
+                    <div class="history-title">Your Analysis History</div>
+                    <ul class="history-list" id="history-list"></ul>
+                </div>
             </div>
 
-            <!-- Transaction Analysis -->
-            <div id="transaction" class="tab-content">
-                <h3>💳 Transaction Fraud Detection</h3>
-                <div class="form-group">
-                    <label for="transaction-amount">Amount:</label>
-                    <input type="number" id="transaction-amount" value="15000" placeholder="15000">
-                </div>
-                <div class="form-group">
-                    <label for="transaction-description">Description:</label>
-                    <input type="text" id="transaction-description" value="Large transfer to unknown account" placeholder="Large transfer to unknown account">
-                </div>
-                <div class="form-group">
-                    <label for="transaction-location">Location (distance from home):</label>
-                    <input type="number" id="transaction-location" value="1500" placeholder="1500">
-                </div>
-                <div class="form-group">
-                    <label for="transaction-time">Timestamp:</label>
-                    <input type="datetime-local" id="transaction-time">
-                </div>
-                <button id="transaction-btn" onclick="analyzeTransaction()">Analyze Transaction</button>
+            <!-- Additional Tools -->
+            <div class="tools-section" id="tools-section" style="display:none;">
+                <h4>🔧 Additional Tools</h4>
+                <a href="/admin/dashboard" id="admin-dashboard-link" class="admin-link" style="display: none;">🔧 Admin Dashboard</a>
+                <button onclick="clearResult()" class="clear-btn">Clear Results</button>
             </div>
-
-            <!-- Social Media Analysis -->
-            <div id="social" class="tab-content">
-                <h3>📱 Social Media Scam Detection</h3>
-                <div class="form-group">
-                    <label for="social-content">Content:</label>
-                    <textarea id="social-content" placeholder="FREE BITCOIN! Click here to claim your prize: http://bit.ly/fake-crypto">FREE BITCOIN! You've been selected for our exclusive giveaway! Click here to claim your prize: http://bit.ly/fake-crypto. Limited time offer!</textarea>
-                </div>
-                <div class="form-group">
-                    <label for="social-followers">Followers:</label>
-                    <input type="number" id="social-followers" value="5" placeholder="5">
-                </div>
-                <div class="form-group">
-                    <label for="social-verified">Verified Account:</label>
-                    <select id="social-verified">
-                        <option value="false" selected>No</option>
-                        <option value="true">Yes</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="social-links">Suspicious Links:</label>
-                    <input type="text" id="social-links" value="http://bit.ly/fake-crypto" placeholder="http://bit.ly/fake-crypto">
-                </div>
-                <button id="social-btn" onclick="analyzeSocial()">Analyze Social Media</button>
-            </div>
-
-            <div id="result" class="result"></div>
-
-            <!-- User History Section -->
-            <div class="history-section" id="history-section" style="display:none;">
-                <div class="history-title">Your Analysis History</div>
-                <ul class="history-list" id="history-list"></ul>
-            </div>
-        </div>
-
-        <!-- Admin Link -->
-        <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 5px;">
-            <h4>🔧 Admin Tools</h4>
-            <a href="/admin/dashboard" id="admin-dashboard-link" style="background-color: #667eea; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-right: 10px; display: none;">🔧 Admin Dashboard</a>
-            <button onclick="clearResult()" style="background-color: #6c757d;">Clear Results</button>
         </div>
     </div>
 
@@ -183,10 +417,12 @@
         function showMainApp() {
             document.getElementById('auth-section').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
+            document.getElementById('tools-section').style.display = 'block'; // Show tools section
         }
         function showAuth() {
             document.getElementById('auth-section').style.display = 'block';
             document.getElementById('main-app').style.display = 'none';
+            document.getElementById('tools-section').style.display = 'none'; // Hide tools section
         }
         function updateUserInfo() {
             const userInfo = document.getElementById('user-info');
