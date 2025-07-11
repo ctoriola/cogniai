@@ -73,7 +73,7 @@ def logout():
 def user_data():
     if 'user_id' not in session:
         return jsonify({'error': 'Not logged in'}), 401
-    user = User.query.get(session['user_id'])
+    user = db.session.get(User, session['user_id'])
     if request.method == 'POST':
         user.data = request.json.get('data', '')
         db.session.commit()
