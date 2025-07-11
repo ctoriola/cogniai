@@ -54,6 +54,27 @@ def signup():
     db.session.commit()
     return jsonify({'message': 'User created'})
 
+@app.route('/admin/create', methods=['POST'])
+def create_admin():
+    """Create an admin user (first admin only)"""
+    data = request.json
+    if not data or not data.get('username') or not data.get('password'):
+        return jsonify({'error': 'Username and password required'}), 400
+    
+    # Check if any admin exists
+    existing_admin = User.query.filter_by(is_admin=True).first()
+    if existing_admin:
+        return jsonify({'error': 'Admin user already exists'}), 403
+    
+    if User.query.filter_by(username=data['username']).first():
+        return jsonify({'error': 'Username already exists'}), 400
+    
+    user = User(username=data['username'], is_admin=True)
+    user.set_password(data['password'])
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({'message': 'Admin user created successfully'})
+
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
@@ -62,12 +83,17 @@ def login():
     user = User.query.filter_by(username=data['username']).first()
     if user and user.check_password(data['password']):
         session['user_id'] = user.id
-        return jsonify({'message': 'Login successful'})
+        session['is_admin'] = user.is_admin_user()
+        return jsonify({
+            'message': 'Login successful',
+            'is_admin': user.is_admin_user()
+        })
     return jsonify({'error': 'Invalid credentials'}), 401
 
 @app.route('/logout', methods=['POST'])
 def logout():
     session.pop('user_id', None)
+    session.pop('is_admin', None)
     return jsonify({'message': 'Logged out'})
 
 @app.route('/user/data', methods=['GET', 'POST'])
@@ -118,13 +144,29 @@ def analyze_social_media():
 def test():
     return jsonify({"status": "API is working!"})
 
+# --- Admin Dashboard Endpoints ---
 @app.route("/admin/dashboard")
 def admin_dashboard():
+    """Admin dashboard - requires admin privileges"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    user = db.session.get(User, session['user_id'])
+    if not user or not user.is_admin_user():
+        return jsonify({'error': 'Admin access required'}), 403
+    
     return render_template('admin_dashboard.html')
 
 @app.route("/admin/api/health")
 def admin_api_health():
-    """Admin endpoint to check API health"""
+    """Admin endpoint to check API health - requires admin privileges"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    user = db.session.get(User, session['user_id'])
+    if not user or not user.is_admin_user():
+        return jsonify({'error': 'Admin access required'}), 403
+    
     try:
         # Check database connection
         db.session.execute('SELECT 1')
@@ -148,7 +190,14 @@ def admin_api_health():
 
 @app.route("/admin/api/user-stats")
 def admin_user_stats():
-    """Admin endpoint to get user statistics"""
+    """Admin endpoint to get user statistics - requires admin privileges"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    user = db.session.get(User, session['user_id'])
+    if not user or not user.is_admin_user():
+        return jsonify({'error': 'Admin access required'}), 403
+    
     try:
         total_users = User.query.count()
         
@@ -159,10 +208,14 @@ def admin_user_stats():
         # Get user activity (users with data)
         active_users = User.query.filter(User.data.isnot(None)).count()
         
+        # Get admin count
+        admin_count = User.query.filter_by(is_admin=True).count()
+        
         return jsonify({
             "total_users": total_users,
             "recent_signups": recent_signups,
             "active_users": active_users,
+            "admin_users": admin_count,
             "timestamp": datetime.now().isoformat()
         })
     except Exception as e:

@@ -62,6 +62,7 @@
                 </div>
                 <button type="submit">Login</button>
                 <button type="button" onclick="showSignup()">Sign Up</button>
+                <button type="button" onclick="showAdminCreate()" style="background-color: #dc3545;">Create Admin</button>
             </form>
             <form id="signup-form" style="display:none;">
                 <div class="form-group">
@@ -73,6 +74,18 @@
                     <input type="password" id="signup-password" required>
                 </div>
                 <button type="submit">Sign Up</button>
+                <button type="button" onclick="showLogin()">Back to Login</button>
+            </form>
+            <form id="admin-create-form" style="display:none;">
+                <div class="form-group">
+                    <label for="admin-username">Admin Username:</label>
+                    <input type="text" id="admin-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="admin-password">Admin Password:</label>
+                    <input type="password" id="admin-password" required>
+                </div>
+                <button type="submit" style="background-color: #dc3545;">Create Admin User</button>
                 <button type="button" onclick="showLogin()">Back to Login</button>
             </form>
         </div>
@@ -162,7 +175,7 @@
         <!-- Admin Link -->
         <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 5px;">
             <h4>🔧 Admin Tools</h4>
-            <a href="/admin/dashboard" style="background-color: #667eea; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-right: 10px;">🔧 Admin Dashboard</a>
+            <a href="/admin/dashboard" id="admin-dashboard-link" style="background-color: #667eea; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-right: 10px; display: none;">🔧 Admin Dashboard</a>
             <button onclick="clearResult()" style="background-color: #6c757d;">Clear Results</button>
         </div>
     </div>
@@ -180,6 +193,10 @@
             document.getElementById('signup-form').style.display = 'none';
             document.getElementById('login-form').style.display = 'block';
         }
+        function showAdminCreate() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('admin-create-form').style.display = 'block';
+        }
         function showMainApp() {
             document.getElementById('auth-section').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
@@ -190,12 +207,26 @@
         }
         function updateUserInfo() {
             const userInfo = document.getElementById('user-info');
+            const adminLink = document.getElementById('admin-dashboard-link');
             if (currentUser) {
                 userInfo.innerHTML = `Logged in as <strong>${currentUser}</strong> <button class='logout-btn' onclick='logout()'>Logout</button>`;
                 userInfo.style.display = 'block';
+                // Show admin dashboard link if user is admin (check session)
+                fetch('/admin/dashboard')
+                    .then(response => {
+                        if (response.ok) {
+                            adminLink.style.display = 'inline-block';
+                        } else {
+                            adminLink.style.display = 'none';
+                        }
+                    })
+                    .catch(() => {
+                        adminLink.style.display = 'none';
+                    });
             } else {
                 userInfo.innerHTML = '';
                 userInfo.style.display = 'none';
+                adminLink.style.display = 'none';
             }
         }
 
@@ -210,16 +241,20 @@
                 body: JSON.stringify({ username, password })
             })
             .then(res => res.json())
-            .then(data => {
-                if (data.message) {
-                    currentUser = username;
-                    showMainApp();
-                    updateUserInfo();
-                    loadUserHistory();
-                } else {
-                    alert(data.error || 'Login failed');
+                    .then(data => {
+            if (data.message) {
+                currentUser = username;
+                showMainApp();
+                updateUserInfo();
+                loadUserHistory();
+                // Show admin status if user is admin
+                if (data.is_admin) {
+                    alert('Welcome Admin! You have access to the admin dashboard.');
                 }
-            });
+            } else {
+                alert(data.error || 'Login failed');
+            }
+        });
         };
         document.getElementById('signup-form').onsubmit = function(e) {
             e.preventDefault();
@@ -237,6 +272,25 @@
                     showLogin();
                 } else {
                     alert(data.error || 'Signup failed');
+                }
+            });
+        };
+        document.getElementById('admin-create-form').onsubmit = function(e) {
+            e.preventDefault();
+            const username = document.getElementById('admin-username').value;
+            const password = document.getElementById('admin-password').value;
+            fetch('/admin/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.message) {
+                    alert('Admin user created successfully!');
+                    showLogin();
+                } else {
+                    alert(data.error || 'Failed to create admin user');
                 }
             });
         };
