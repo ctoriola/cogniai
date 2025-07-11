@@ -115,7 +115,14 @@ class LightweightAI:
         """Analyze email for fraud indicators"""
         features = self.extract_features(email_content)
         risk_score = self.calculate_risk_score(features)
-        
+        # Ensure risk_score is always a float and not NaN
+        try:
+            risk_score = float(risk_score)
+            if not np.isfinite(risk_score):
+                risk_score = 0.0
+        except Exception:
+            risk_score = 0.0
+        print(f"[DEBUG] Email risk_score: {risk_score}")
         # Determine risk level
         if risk_score >= 70:
             risk_level = "HIGH"
@@ -126,7 +133,6 @@ class LightweightAI:
         else:
             risk_level = "LOW"
             recommendation = "Appears safe - minimal risk indicators"
-        
         # Generate detailed analysis
         analysis = {
             'risk_score': risk_score,
@@ -135,7 +141,6 @@ class LightweightAI:
             'features': features,
             'indicators': []
         }
-        
         # Add specific indicators
         if features.get('pattern_urgent', 0) > 0:
             analysis['indicators'].append("Urgency indicators detected")
@@ -147,7 +152,7 @@ class LightweightAI:
             analysis['indicators'].append("Multiple email addresses detected")
         if features.get('url_count', 0) > 3:
             analysis['indicators'].append("Suspicious number of URLs")
-        
+        print(f"[DEBUG] Email analysis result: {analysis}")
         return analysis
     
     def analyze_transaction(self, transaction_data):
