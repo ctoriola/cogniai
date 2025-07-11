@@ -23,6 +23,9 @@ with app.app_context():
     db.create_all()
     print("Tables created! Using database:", app.config['SQLALCHEMY_DATABASE_URI'])
 
+import os
+print("ENV VARS:", dict(os.environ))
+
 @app.route("/")
 def home():
     return render_template('index.html')
