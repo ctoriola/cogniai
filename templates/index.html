@@ -543,13 +543,21 @@
             const list = document.getElementById('history-list');
             if (currentUser && userHistory.length > 0) {
                 section.style.display = 'block';
-                list.innerHTML = userHistory.map(item => `
-                    <li class="history-item">
-                        <div><span class="history-type">${item.type}</span> <span style="float:right; color:#888; font-size:12px;">${item.timestamp}</span></div>
-                        <div><strong>Input:</strong> <pre style="white-space:pre-wrap;">${JSON.stringify(item.input, null, 2)}</pre></div>
-                        <div><strong>Risk:</strong> ${(item.result.risk * 100).toFixed(1)}%</div>
-                    </li>
-                `).join('');
+                list.innerHTML = userHistory.map(item => {
+                    let riskDisplay = 'N/A';
+                    if (item.result && item.result.risk_score !== undefined) {
+                        riskDisplay = `${item.result.risk_score}%`;
+                    } else if (item.result && item.result.risk !== undefined) {
+                        riskDisplay = `${(item.result.risk * 100).toFixed(1)}%`;
+                    }
+                    return `
+                        <li class="history-item">
+                            <div><span class="history-type">${item.type}</span> <span style="float:right; color:#888; font-size:12px;">${item.timestamp}</span></div>
+                            <div><strong>Input:</strong> <pre style="white-space:pre-wrap;">${JSON.stringify(item.input, null, 2)}</pre></div>
+                            <div><strong>Risk:</strong> ${riskDisplay}</div>
+                        </li>
+                    `;
+                }).join('');
             } else {
                 section.style.display = 'none';
                 list.innerHTML = '';
