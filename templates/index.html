@@ -159,10 +159,10 @@
             </div>
         </div>
 
-        <!-- Test section -->
+        <!-- Admin Link -->
         <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 5px;">
-            <h4>🔧 Debug Tools</h4>
-            <button onclick="testAPI()" style="background-color: #28a745;">Test API Connection</button>
+            <h4>🔧 Admin Tools</h4>
+            <a href="/admin/dashboard" style="background-color: #667eea; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-right: 10px;">🔧 Admin Dashboard</a>
             <button onclick="clearResult()" style="background-color: #6c757d;">Clear Results</button>
         </div>
     </div>
@@ -422,21 +422,7 @@
             resultDiv.style.display = 'block';
         }
         document.getElementById('transaction-time').value = new Date().toISOString().slice(0, 16);
-        function testAPI() {
-            fetch('/test')
-                .then(response => response.json())
-                .then(data => {
-                    if (data && typeof data === 'object' && data.status) {
-                        const resultDiv = document.getElementById('result');
-                        resultDiv.innerHTML = `<h4>API Test</h4><p>${data.status}</p>`;
-                        resultDiv.className = 'result success';
-                        resultDiv.style.display = 'block';
-                    } else {
-                        showResult(data, 'API Test');
-                    }
-                })
-                .catch(error => { showError(error); });
-        }
+
         function clearResult() {
             document.getElementById('result').style.display = 'none';
         }

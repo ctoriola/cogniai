@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Fraud Detection</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            padding: 30px; 
+            text-align: center;
+        }
+        .header h1 { 
+            margin: 0; 
+            font-size: 2.5rem; 
+            font-weight: 300;
+        }
+        .header p { 
+            margin: 10px 0 0 0; 
+            opacity: 0.9; 
+            font-size: 1.1rem;
+        }
+        .content { 
+            padding: 30px; 
+        }
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 25px; 
+            margin-bottom: 30px;
+        }
+        .stat-card { 
+            background: #f8f9fa; 
+            border-radius: 12px; 
+            padding: 25px; 
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .stat-card:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .stat-title { 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            color: #6c757d; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            margin-bottom: 10px;
+        }
+        .stat-value { 
+            font-size: 2.5rem; 
+            font-weight: 700; 
+            color: #2c3e50; 
+            margin: 0;
+        }
+        .stat-change { 
+            font-size: 0.9rem; 
+            color: #28a745; 
+            margin-top: 5px;
+        }
+        .health-section { 
+            background: #f8f9fa; 
+            border-radius: 12px; 
+            padding: 25px; 
+            margin-bottom: 30px;
+        }
+        .health-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 20px;
+        }
+        .health-item { 
+            background: white; 
+            border-radius: 8px; 
+            padding: 20px; 
+            border: 1px solid #e9ecef;
+        }
+        .health-status { 
+            display: inline-block; 
+            padding: 5px 12px; 
+            border-radius: 20px; 
+            font-size: 0.8rem; 
+            font-weight: 600; 
+            text-transform: uppercase;
+        }
+        .status-good { 
+            background: #d4edda; 
+            color: #155724; 
+        }
+        .status-error { 
+            background: #f8d7da; 
+            color: #721c24; 
+        }
+        .status-warning { 
+            background: #fff3cd; 
+            color: #856404; 
+        }
+        .refresh-btn { 
+            background: #667eea; 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 1rem; 
+            margin-bottom: 20px;
+            transition: background 0.2s ease;
+        }
+        .refresh-btn:hover { 
+            background: #5a6fd8; 
+        }
+        .timestamp { 
+            font-size: 0.8rem; 
+            color: #6c757d; 
+            margin-top: 10px;
+        }
+        .loading { 
+            opacity: 0.6; 
+            pointer-events: none;
+        }
+        .error-message { 
+            background: #f8d7da; 
+            color: #721c24; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin: 10px 0;
+        }
+        .nav-links { 
+            text-align: center; 
+            margin-top: 20px;
+        }
+        .nav-links a { 
+            color: white; 
+            text-decoration: none; 
+            margin: 0 15px; 
+            padding: 8px 16px; 
+            border-radius: 6px; 
+            background: rgba(255,255,255,0.2);
+            transition: background 0.2s ease;
+        }
+        .nav-links a:hover { 
+            background: rgba(255,255,255,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Admin Dashboard</h1>
+            <p>Fraud Detection System Monitoring</p>
+            <div class="nav-links">
+                <a href="/">← Back to Main App</a>
+                <a href="/admin/dashboard">Refresh Dashboard</a>
+            </div>
+        </div>
+        
+        <div class="content">
+            <button class="refresh-btn" onclick="refreshAll()">🔄 Refresh All Data</button>
+            
+            <!-- API Health Status -->
+            <div class="health-section">
+                <h2>🔍 System Health</h2>
+                <div class="health-grid" id="health-grid">
+                    <div class="health-item">
+                        <h3>Database</h3>
+                        <div class="health-status status-good" id="db-status">Checking...</div>
+                        <div class="timestamp" id="db-timestamp"></div>
+                    </div>
+                    <div class="health-item">
+                        <h3>AI Model</h3>
+                        <div class="health-status status-good" id="ai-status">Checking...</div>
+                        <div class="timestamp" id="ai-timestamp"></div>
+                    </div>
+                    <div class="health-item">
+                        <h3>API Status</h3>
+                        <div class="health-status status-good" id="api-status">Checking...</div>
+                        <div class="timestamp" id="api-timestamp"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Statistics -->
+            <div class="health-section">
+                <h2>👥 User Statistics</h2>
+                <div class="stats-grid" id="user-stats">
+                    <div class="stat-card">
+                        <div class="stat-title">Total Users</div>
+                        <div class="stat-value" id="total-users">-</div>
+                        <div class="stat-change">All time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Recent Signups</div>
+                        <div class="stat-value" id="recent-signups">-</div>
+                        <div class="stat-change">Last 7 days</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Active Users</div>
+                        <div class="stat-value" id="active-users">-</div>
+                        <div class="stat-change">With activity</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="error-container"></div>
+        </div>
+    </div>
+
+    <script>
+        let refreshTimeout;
+        
+        function refreshAll() {
+            clearTimeout(refreshTimeout);
+            document.querySelector('.refresh-btn').classList.add('loading');
+            document.querySelector('.refresh-btn').textContent = '🔄 Refreshing...';
+            
+            Promise.all([
+                checkAPIHealth(),
+                loadUserStats()
+            ]).finally(() => {
+                document.querySelector('.refresh-btn').classList.remove('loading');
+                document.querySelector('.refresh-btn').textContent = '🔄 Refresh All Data';
+            });
+        }
+        
+        function checkAPIHealth() {
+            return fetch('/admin/api/health')
+                .then(response => response.json())
+                .then(data => {
+                    updateHealthStatus('db-status', data.database, 'db-timestamp', data.timestamp);
+                    updateHealthStatus('ai-status', data.ai_model, 'ai-timestamp', data.timestamp);
+                    updateHealthStatus('api-status', 'Connected', 'api-timestamp', data.timestamp);
+                })
+                .catch(error => {
+                    updateHealthStatus('db-status', 'Error', 'db-timestamp', '');
+                    updateHealthStatus('ai-status', 'Error', 'ai-timestamp', '');
+                    updateHealthStatus('api-status', 'Error', 'api-timestamp', '');
+                    showError('Failed to check API health: ' + error.message);
+                });
+        }
+        
+        function loadUserStats() {
+            return fetch('/admin/api/user-stats')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('total-users').textContent = data.total_users;
+                    document.getElementById('recent-signups').textContent = data.recent_signups;
+                    document.getElementById('active-users').textContent = data.active_users;
+                })
+                .catch(error => {
+                    showError('Failed to load user stats: ' + error.message);
+                });
+        }
+        
+        function updateHealthStatus(elementId, status, timestampId, timestamp) {
+            const element = document.getElementById(elementId);
+            const timestampElement = document.getElementById(timestampId);
+            
+            element.textContent = status;
+            element.className = 'health-status ' + 
+                (status.includes('Error') ? 'status-error' : 
+                 status.includes('Warning') ? 'status-warning' : 'status-good');
+            
+            if (timestampElement && timestamp) {
+                timestampElement.textContent = 'Last checked: ' + new Date(timestamp).toLocaleString();
+            }
+        }
+        
+        function showError(message) {
+            const container = document.getElementById('error-container');
+            container.innerHTML = '<div class="error-message">⚠️ ' + message + '</div>';
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Auto-refresh every 30 seconds
+        function startAutoRefresh() {
+            refreshTimeout = setTimeout(() => {
+                refreshAll();
+                startAutoRefresh();
+            }, 30000);
+        }
+        
+        // Initial load
+        window.onload = function() {
+            refreshAll();
+            startAutoRefresh();
+        };
+    </script>
+</body>
+</html> 

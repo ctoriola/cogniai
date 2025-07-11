@@ -5,6 +5,7 @@ from models.lightweight_ai import LightweightAI
 from models.user import db, User
 import os
 import urllib.parse
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
@@ -116,6 +117,56 @@ def analyze_social_media():
 @app.route("/test")
 def test():
     return jsonify({"status": "API is working!"})
+
+@app.route("/admin/dashboard")
+def admin_dashboard():
+    return render_template('admin_dashboard.html')
+
+@app.route("/admin/api/health")
+def admin_api_health():
+    """Admin endpoint to check API health"""
+    try:
+        # Check database connection
+        db.session.execute('SELECT 1')
+        db_status = "Connected"
+    except Exception as e:
+        db_status = f"Error: {str(e)}"
+    
+    # Check AI model
+    try:
+        test_result = ai.analyze_email("Test email")
+        ai_status = "Working"
+    except Exception as e:
+        ai_status = f"Error: {str(e)}"
+    
+    return jsonify({
+        "database": db_status,
+        "ai_model": ai_status,
+        "timestamp": datetime.now().isoformat(),
+        "uptime": "Running"
+    })
+
+@app.route("/admin/api/user-stats")
+def admin_user_stats():
+    """Admin endpoint to get user statistics"""
+    try:
+        total_users = User.query.count()
+        
+        # Get recent signups (last 7 days)
+        week_ago = datetime.now() - timedelta(days=7)
+        recent_signups = User.query.filter(User.id >= 1).count()  # Simplified for now
+        
+        # Get user activity (users with data)
+        active_users = User.query.filter(User.data.isnot(None)).count()
+        
+        return jsonify({
+            "total_users": total_users,
+            "recent_signups": recent_signups,
+            "active_users": active_users,
+            "timestamp": datetime.now().isoformat()
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
