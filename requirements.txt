@@ -1,10 +1,8 @@
 flask
 flask-cors
-scikit-learn
+flask-sqlalchemy
+werkzeug
 numpy
-pandas
-nltk
-spacy
 transformers
 torch
-# Removed all nvidia-* and triton dependencies for Railway CPU deployment 
+psycopg2-binary 

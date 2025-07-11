@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraud Detection API</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; text-align: center; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+        textarea { height: 100px; resize: vertical; }
+        button { background-color: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-right: 10px; }
+        button:hover { background-color: #0056b3; }
+        .result { margin-top: 20px; padding: 15px; border-radius: 5px; display: none; }
+        .result.success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .result.error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .risk-high { color: #dc3545; font-weight: bold; }
+        .risk-medium { color: #ffc107; font-weight: bold; }
+        .risk-low { color: #28a745; font-weight: bold; }
+        .tabs { display: flex; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; background-color: #e9ecef; border: none; cursor: pointer; border-radius: 5px 5px 0 0; margin-right: 5px; }
+        .tab.active { background-color: #007bff; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .feature-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+        .feature-card { background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.2s; }
+        .feature-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .feature-name { font-weight: bold; color: #333; margin-bottom: 5px; font-size: 14px; text-transform: capitalize; }
+        .feature-value { font-size: 18px; font-weight: bold; color: #007bff; }
+        .feature-value.high { color: #dc3545; }
+        .feature-value.medium { color: #ffc107; }
+        .feature-value.low { color: #28a745; }
+        .auth-section { margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; }
+        .user-info { margin-bottom: 20px; }
+        .history-section { margin-top: 30px; }
+        .history-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+        .history-list { list-style: none; padding: 0; }
+        .history-item { background: #f1f1f1; border-radius: 6px; margin-bottom: 10px; padding: 12px; }
+        .history-type { font-weight: bold; color: #007bff; }
+        .logout-btn { background-color: #dc3545; }
+        .logout-btn:hover { background-color: #a71d2a; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Fraud Detection API</h1>
+
+        <!-- Auth Section -->
+        <div class="auth-section" id="auth-section">
+            <div id="user-info" class="user-info" style="display:none;"></div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-username">Username:</label>
+                    <input type="text" id="login-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password:</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit">Login</button>
+                <button type="button" onclick="showSignup()">Sign Up</button>
+            </form>
+            <form id="signup-form" style="display:none;">
+                <div class="form-group">
+                    <label for="signup-username">Username:</label>
+                    <input type="text" id="signup-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password:</label>
+                    <input type="password" id="signup-password" required>
+                </div>
+                <button type="submit">Sign Up</button>
+                <button type="button" onclick="showLogin()">Back to Login</button>
+            </form>
+        </div>
+
+        <!-- User Analysis Forms (hidden until login) -->
+        <div id="main-app" style="display:none;">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('email')">Email Analysis</button>
+                <button class="tab" onclick="showTab('transaction')">Transaction Analysis</button>
+                <button class="tab" onclick="showTab('social')">Social Media Analysis</button>
+            </div>
+
+            <!-- Email Analysis -->
+            <div id="email" class="tab-content active">
+                <h3>📧 Email Fraud Detection</h3>
+                <div class="form-group">
+                    <label for="email-sender">Sender:</label>
+                    <input type="text" id="email-sender" value="noreply@fake-bank.com" placeholder="noreply@fake-bank.com">
+                </div>
+                <div class="form-group">
+                    <label for="email-subject">Subject:</label>
+                    <input type="text" id="email-subject" value="URGENT: Your account has been suspended" placeholder="URGENT: Account Suspended">
+                </div>
+                <div class="form-group">
+                    <label for="email-content">Content:</label>
+                    <textarea id="email-content" placeholder="Your account has been suspended. Click here to verify your identity immediately: http://bit.ly/fake-bank">URGENT: Your account has been suspended due to suspicious activity. Click here to verify your identity immediately: http://bit.ly/fake-bank-verify. This is your final warning before account termination.</textarea>
+                </div>
+                <button id="email-btn" onclick="analyzeEmail()">Analyze Email</button>
+            </div>
+
+            <!-- Transaction Analysis -->
+            <div id="transaction" class="tab-content">
+                <h3>💳 Transaction Fraud Detection</h3>
+                <div class="form-group">
+                    <label for="transaction-amount">Amount:</label>
+                    <input type="number" id="transaction-amount" value="15000" placeholder="15000">
+                </div>
+                <div class="form-group">
+                    <label for="transaction-description">Description:</label>
+                    <input type="text" id="transaction-description" value="Large transfer to unknown account" placeholder="Large transfer to unknown account">
+                </div>
+                <div class="form-group">
+                    <label for="transaction-location">Location (distance from home):</label>
+                    <input type="number" id="transaction-location" value="1500" placeholder="1500">
+                </div>
+                <div class="form-group">
+                    <label for="transaction-time">Timestamp:</label>
+                    <input type="datetime-local" id="transaction-time">
+                </div>
+                <button id="transaction-btn" onclick="analyzeTransaction()">Analyze Transaction</button>
+            </div>
+
+            <!-- Social Media Analysis -->
+            <div id="social" class="tab-content">
+                <h3>📱 Social Media Scam Detection</h3>
+                <div class="form-group">
+                    <label for="social-content">Content:</label>
+                    <textarea id="social-content" placeholder="FREE BITCOIN! Click here to claim your prize: http://bit.ly/fake-crypto">FREE BITCOIN! You've been selected for our exclusive giveaway! Click here to claim your prize: http://bit.ly/fake-crypto. Limited time offer!</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="social-followers">Followers:</label>
+                    <input type="number" id="social-followers" value="5" placeholder="5">
+                </div>
+                <div class="form-group">
+                    <label for="social-verified">Verified Account:</label>
+                    <select id="social-verified">
+                        <option value="false" selected>No</option>
+                        <option value="true">Yes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="social-links">Suspicious Links:</label>
+                    <input type="text" id="social-links" value="http://bit.ly/fake-crypto" placeholder="http://bit.ly/fake-crypto">
+                </div>
+                <button id="social-btn" onclick="analyzeSocial()">Analyze Social Media</button>
+            </div>
+
+            <div id="result" class="result"></div>
+
+            <!-- User History Section -->
+            <div class="history-section" id="history-section" style="display:none;">
+                <div class="history-title">Your Analysis History</div>
+                <ul class="history-list" id="history-list"></ul>
+            </div>
+        </div>
+
+        <!-- Test section -->
+        <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 5px;">
+            <h4>🔧 Debug Tools</h4>
+            <button onclick="testAPI()" style="background-color: #28a745;">Test API Connection</button>
+            <button onclick="clearResult()" style="background-color: #6c757d;">Clear Results</button>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let userHistory = [];
+
+        // --- Auth UI Logic ---
+        function showSignup() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('signup-form').style.display = 'block';
+        }
+        function showLogin() {
+            document.getElementById('signup-form').style.display = 'none';
+            document.getElementById('login-form').style.display = 'block';
+        }
+        function showMainApp() {
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+        }
+        function showAuth() {
+            document.getElementById('auth-section').style.display = 'block';
+            document.getElementById('main-app').style.display = 'none';
+        }
+        function updateUserInfo() {
+            const userInfo = document.getElementById('user-info');
+            if (currentUser) {
+                userInfo.innerHTML = `Logged in as <strong>${currentUser}</strong> <button class='logout-btn' onclick='logout()'>Logout</button>`;
+                userInfo.style.display = 'block';
+            } else {
+                userInfo.innerHTML = '';
+                userInfo.style.display = 'none';
+            }
+        }
+
+        // --- Auth API Logic ---
+        document.getElementById('login-form').onsubmit = function(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.message) {
+                    currentUser = username;
+                    showMainApp();
+                    updateUserInfo();
+                    loadUserHistory();
+                } else {
+                    alert(data.error || 'Login failed');
+                }
+            });
+        };
+        document.getElementById('signup-form').onsubmit = function(e) {
+            e.preventDefault();
+            const username = document.getElementById('signup-username').value;
+            const password = document.getElementById('signup-password').value;
+            fetch('/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.message) {
+                    alert('Signup successful! Please log in.');
+                    showLogin();
+                } else {
+                    alert(data.error || 'Signup failed');
+                }
+            });
+        };
+        function logout() {
+            fetch('/logout', { method: 'POST' })
+                .then(() => {
+                    currentUser = null;
+                    userHistory = [];
+                    showAuth();
+                    updateUserInfo();
+                    renderHistory();
+                });
+        }
+
+        // --- User History Logic ---
+        function loadUserHistory() {
+            fetch('/user/data')
+                .then(res => res.json())
+                .then(data => {
+                    try {
+                        userHistory = data.data ? JSON.parse(data.data) : [];
+                    } catch {
+                        userHistory = [];
+                    }
+                    renderHistory();
+                });
+        }
+        function saveUserHistory() {
+            fetch('/user/data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: JSON.stringify(userHistory) })
+            });
+        }
+        function addToHistory(type, input, result) {
+            const entry = {
+                type,
+                input,
+                result,
+                timestamp: new Date().toLocaleString()
+            };
+            userHistory.unshift(entry);
+            if (userHistory.length > 20) userHistory.pop();
+            saveUserHistory();
+            renderHistory();
+        }
+        function renderHistory() {
+            const section = document.getElementById('history-section');
+            const list = document.getElementById('history-list');
+            if (currentUser && userHistory.length > 0) {
+                section.style.display = 'block';
+                list.innerHTML = userHistory.map(item => `
+                    <li class="history-item">
+                        <div><span class="history-type">${item.type}</span> <span style="float:right; color:#888; font-size:12px;">${item.timestamp}</span></div>
+                        <div><strong>Input:</strong> <pre style="white-space:pre-wrap;">${JSON.stringify(item.input, null, 2)}</pre></div>
+                        <div><strong>Risk:</strong> ${(item.result.risk * 100).toFixed(1)}%</div>
+                    </li>
+                `).join('');
+            } else {
+                section.style.display = 'none';
+                list.innerHTML = '';
+            }
+        }
+
+        // --- Analysis Logic (unchanged except for addToHistory) ---
+        function showTab(tabName) {
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+        function analyzeEmail() {
+            const btn = document.getElementById('email-btn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Analyzing...';
+            btn.disabled = true;
+            const data = {
+                sender: document.getElementById('email-sender').value,
+                subject: document.getElementById('email-subject').value,
+                content: document.getElementById('email-content').value
+            };
+            fetch('/analyze/email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json();
+            })
+            .then(result => {
+                showResult(result, 'Email');
+                addToHistory('Email', data, result);
+            })
+            .catch(error => showError(error))
+            .finally(() => { btn.textContent = originalText; btn.disabled = false; });
+        }
+        function analyzeTransaction() {
+            const btn = document.getElementById('transaction-btn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Analyzing...';
+            btn.disabled = true;
+            const data = {
+                amount: parseFloat(document.getElementById('transaction-amount').value),
+                description: document.getElementById('transaction-description').value,
+                location: { distance_from_home: parseFloat(document.getElementById('transaction-location').value) },
+                timestamp: document.getElementById('transaction-time').value
+            };
+            fetch('/analyze/transaction', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                showResult(result, 'Transaction');
+                addToHistory('Transaction', data, result);
+            })
+            .catch(error => showError(error))
+            .finally(() => { btn.textContent = originalText; btn.disabled = false; });
+        }
+        function analyzeSocial() {
+            const btn = document.getElementById('social-btn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Analyzing...';
+            btn.disabled = true;
+            const data = {
+                content: document.getElementById('social-content').value,
+                profile: {
+                    followers: parseInt(document.getElementById('social-followers').value),
+                    verified: document.getElementById('social-verified').value === 'true'
+                },
+                links: document.getElementById('social-links').value.split(',').map(link => link.trim())
+            };
+            fetch('/analyze/social_media', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                showResult(result, 'Social Media');
+                addToHistory('Social Media', data, result);
+            })
+            .catch(error => showError(error))
+            .finally(() => { btn.textContent = originalText; btn.disabled = false; });
+        }
+        function showResult(data, type) {
+            const resultDiv = document.getElementById('result');
+            const risk = data.risk;
+            let riskClass = 'risk-low';
+            let riskText = 'LOW';
+            if (risk > 0.7) { riskClass = 'risk-high'; riskText = 'HIGH'; }
+            else if (risk > 0.4) { riskClass = 'risk-medium'; riskText = 'MEDIUM'; }
+            resultDiv.innerHTML = `
+                <h4>${type} Analysis Result</h4>
+                <p><strong>Risk Level:</strong> <span class="${riskClass}">${riskText} (${(risk * 100).toFixed(1)}%)</span></p>
+                <p><strong>Key Features:</strong></p>
+                <div class="feature-cards">
+                    ${Object.entries(data.features).map(([key, value]) => {
+                        const numValue = typeof value === 'number' ? value : parseFloat(value) || 0;
+                        let valueClass = 'low';
+                        if (numValue > 0.7) valueClass = 'high';
+                        else if (numValue > 0.3) valueClass = 'medium';
+                        return `
+                            <div class="feature-card">
+                                <div class="feature-name">${key.replace(/_/g, ' ')}</div>
+                                <div class="feature-value ${valueClass}">${typeof value === 'number' ? value.toFixed(3) : value}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+            resultDiv.className = 'result success';
+            resultDiv.style.display = 'block';
+        }
+        function showError(error) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `<h4>Error</h4><p>${error.message}</p>`;
+            resultDiv.className = 'result error';
+            resultDiv.style.display = 'block';
+        }
+        document.getElementById('transaction-time').value = new Date().toISOString().slice(0, 16);
+        function testAPI() {
+            fetch('/test')
+                .then(response => response.json())
+                .then(data => { showResult(data, 'API Test'); })
+                .catch(error => { showError(error); });
+        }
+        function clearResult() {
+            document.getElementById('result').style.display = 'none';
+        }
+        // On load, check if user is logged in (try to load history)
+        window.onload = function() {
+            fetch('/user/data')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.data !== undefined) {
+                        // User is logged in
+                        currentUser = 'You';
+                        showMainApp();
+                        updateUserInfo();
+                        loadUserHistory();
+                    } else {
+                        showAuth();
+                    }
+                })
+                .catch(() => showAuth());
+        };
+    </script>
+</body>
+</html> 

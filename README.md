@@ -13,6 +13,7 @@ A comprehensive fraud detection system using **Machine Learning**, **Deep Learni
 - **Voice Calls** - Phone scam detection
 
 ### **Advanced AI/ML Capabilities**
+- **Hugging Face Models** - Pre-trained transformers for fraud detection
 - **Machine Learning Models** - Random Forest, Gradient Boosting
 - **Deep Learning** - LSTM, Bidirectional layers (when TensorFlow available)
 - **Natural Language Processing** - Comprehensive text analysis
@@ -95,14 +96,31 @@ For each input, the system:
 
 ## 🔧 Technical Architecture
 
+### **Hugging Face Integration** 🤖
+The system now uses **pre-trained Hugging Face models** to reduce deployment size and improve accuracy:
+
+#### **Models Used**
+- **`cardiffnlp/twitter-roberta-base-sentiment-latest`** - Sentiment analysis
+- **`microsoft/DialoGPT-medium`** - Text classification for fraud detection
+- **`dslim/bert-base-NER`** - Named Entity Recognition
+- **`facebook/bart-large-mnli`** - Zero-shot classification
+- **`ProsusAI/finbert`** - Financial text analysis (optional)
+- **`j-hartmann/emotion-english-distilroberta-base`** - Emotion detection (optional)
+
+#### **Benefits**
+- **Smaller Deployment**: No need to upload large model files
+- **Better Accuracy**: State-of-the-art pre-trained models
+- **Faster Deploys**: Only code is deployed, models downloaded at runtime
+- **Automatic Updates**: Models are always up-to-date
+
 ### **NLP Processing Pipeline**
 ```
-Text Input → Linguistic Analysis → Entity Recognition → Sentiment Analysis → Readability Metrics → Risk Assessment
+Text Input → Hugging Face Models → Linguistic Analysis → Entity Recognition → Sentiment Analysis → Readability Metrics → Risk Assessment
 ```
 
 ### **ML Model Pipeline**
 ```
-Features → ML Model → Risk Score → Threat Level → Alert Generation
+Features → HF Models + ML Models → Risk Score → Threat Level → Alert Generation
 ```
 
 ## 📊 API Endpoints
@@ -175,17 +193,22 @@ Features → ML Model → Risk Score → Threat Level → Alert Generation
 pip install -r requirements.txt
 ```
 
-### **2. Start the Platform**
+### **2. Test Hugging Face AI System (Optional)**
+```bash
+python test_huggingface_ai.py
+```
+
+### **3. Start the Platform**
 ```bash
 python app.py
 ```
 
-### **3. Access the Dashboard**
+### **4. Access the Dashboard**
 - **Dashboard**: http://localhost:5000/dashboard
 - **API**: http://localhost:5000
 - **Test**: http://localhost:5000/test
 
-### **4. Train Models (Optional)**
+### **5. Train Models (Optional)**
 ```bash
 python train_models.py
 ```
