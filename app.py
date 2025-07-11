@@ -6,6 +6,7 @@ from models.user import db, User
 import os
 import urllib.parse
 from datetime import datetime, timedelta
+from sqlalchemy import text
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
@@ -38,14 +39,14 @@ with app.app_context():
     if 'is_admin' not in column_names:
         print("Adding is_admin column to users table...")
         try:
-            db.session.execute('ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE')
+            db.session.execute(text('ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE'))
             db.session.commit()
             print("Successfully added is_admin column!")
         except Exception as e:
             print(f"Error adding is_admin column: {e}")
             # Try alternative syntax for PostgreSQL
             try:
-                db.session.execute('ALTER TABLE "users" ADD COLUMN is_admin BOOLEAN DEFAULT FALSE')
+                db.session.execute(text('ALTER TABLE "users" ADD COLUMN is_admin BOOLEAN DEFAULT FALSE'))
                 db.session.commit()
                 print("Successfully added is_admin column with quotes!")
             except Exception as e2:
@@ -264,7 +265,7 @@ def migrate_add_admin_column():
         
         if 'is_admin' not in column_names:
             # Add the column
-            db.session.execute('ALTER TABLE "users" ADD COLUMN is_admin BOOLEAN DEFAULT FALSE')
+            db.session.execute(text('ALTER TABLE "users" ADD COLUMN is_admin BOOLEAN DEFAULT FALSE'))
             db.session.commit()
             return jsonify({"message": "Successfully added is_admin column to users table"})
         else:
