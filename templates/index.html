@@ -543,7 +543,12 @@
             const list = document.getElementById('history-list');
             if (currentUser && userHistory.length > 0) {
                 section.style.display = 'block';
-                list.innerHTML = userHistory.map(item => {
+                
+                // Show first 2 items always
+                const recentItems = userHistory.slice(0, 2);
+                const olderItems = userHistory.slice(2);
+                
+                let html = recentItems.map(item => {
                     let riskDisplay = 'N/A';
                     if (item.result && item.result.risk_score !== undefined) {
                         riskDisplay = `${item.result.risk_score}%`;
@@ -558,6 +563,57 @@
                         </li>
                     `;
                 }).join('');
+                
+                // Add expandable section for older items
+                if (olderItems.length > 0) {
+                    html += `
+                        <li class="history-item" id="expandable-section" style="cursor: pointer; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-left: 4px solid #667eea;">
+                            <div style="text-align: center; color: #667eea; font-weight: bold;">
+                                <span id="expand-text">📋 Show ${olderItems.length} More Analyses</span>
+                                <span id="collapse-text" style="display: none;">📋 Hide Older Analyses</span>
+                            </div>
+                        </li>
+                        <div id="older-items" style="display: none;">
+                            ${olderItems.map(item => {
+                                let riskDisplay = 'N/A';
+                                if (item.result && item.result.risk_score !== undefined) {
+                                    riskDisplay = `${item.result.risk_score}%`;
+                                } else if (item.result && item.result.risk !== undefined) {
+                                    riskDisplay = `${(item.result.risk * 100).toFixed(1)}%`;
+                                }
+                                return `
+                                    <li class="history-item">
+                                        <div><span class="history-type">${item.type}</span> <span style="float:right; color:#888; font-size:12px;">${item.timestamp}</span></div>
+                                        <div><strong>Input:</strong> <pre style="white-space:pre-wrap;">${JSON.stringify(item.input, null, 2)}</pre></div>
+                                        <div><strong>Risk:</strong> ${riskDisplay}</div>
+                                    </li>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+                }
+                
+                list.innerHTML = html;
+                
+                // Add click handler for expandable section
+                const expandableSection = document.getElementById('expandable-section');
+                if (expandableSection) {
+                    expandableSection.onclick = function() {
+                        const olderItems = document.getElementById('older-items');
+                        const expandText = document.getElementById('expand-text');
+                        const collapseText = document.getElementById('collapse-text');
+                        
+                        if (olderItems.style.display === 'none') {
+                            olderItems.style.display = 'block';
+                            expandText.style.display = 'none';
+                            collapseText.style.display = 'inline';
+                        } else {
+                            olderItems.style.display = 'none';
+                            expandText.style.display = 'inline';
+                            collapseText.style.display = 'none';
+                        }
+                    };
+                }
             } else {
                 section.style.display = 'none';
                 list.innerHTML = '';
