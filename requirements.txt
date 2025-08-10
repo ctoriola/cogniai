@@ -4,4 +4,4 @@ flask-sqlalchemy
 werkzeug
 numpy
 scikit-learn
-psycopg2 
+psycopg2-binary 
